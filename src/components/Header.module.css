@@ -1,0 +1,165 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+  color: #fff;
+  background-color: #1d1d3b; /* Background color for sections */
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #1d1d3b 30%, #6f42c1);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+.hero-section::before {
+  content: ""; /* Empty content for the pseudo-element */
+  position: absolute; /* Positioning the circle relative to the hero section */
+  width: 800px; /* Width of the circle */
+  height: 800px; /* Height of the circle */
+  background: rgba(255, 255, 255, 0.1); /* Light semi-transparent color */
+  border-radius: 50%; /* Makes the element circular */
+  top: -150px; /* Positioning the circle above the hero section */
+  right: -150px; /* Positioning the circle to the right */
+  z-index: 0; /* Ensure this is behind the hero content */
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.nav-links li {
+  display: inline;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: 64px;
+  letter-spacing: 2px;
+}
+
+.hero-description {
+  max-width: 600px;
+  margin: 20px auto;
+  font-size: 18px;
+}
+
+.cta-button {
+  background-color: #ff6f91;
+  border: none;
+  border-radius: 25px;
+  padding: 15px 40px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #ff3b6d;
+}
+
+/* Hero Animation */
+.hero-animation img {
+  max-width: 400px;
+  margin-top: 30px;
+}
+
+/* Section Styles */
+.section-title {
+  font-size: 36px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.section-description,
+.feature-list,
+.audience-list,
+.value-list {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Features Section */
+.feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.feature-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 300px;
+}
+
+/* Target Audience Slider */
+.audience-slider-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.audience-slider {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.audience-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  width: 300px; /* Width of each card */
+  margin: 10px;
+  flex: 0 0 300px; /* Ensure all items are of equal width */
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff6f91;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  z-index: 1; /* Ensure buttons are above the slider */
+}
+
+.prev-btn {
+  left: -25px;
+}
+
+.next-btn {
+  right: -25px;
+}
+
+/* Footer */
+.footer-section {
+  background: #232323;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.footer-section a {
+  color: #ff6f91;
+  text-decoration: none;
+}
