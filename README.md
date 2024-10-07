@@ -1,6 +1,6 @@
 # HACKINDIA--SYNTAX-SQUAD
 
-TokenForge
+
 TokenForge is a decentralized platform that allows users to buy and sell NFTs representing computing resources such as CPU, GPU, and storage devices. By leveraging blockchain technology, TokenForge creates a transparent and secure marketplace where users can trade computing power as easily as digital assets, all without the need for intermediaries.
 
 Features :
