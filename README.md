@@ -1,9 +1,9 @@
 # HACKINDIA--SYNTAX-SQUAD
 
 
-TokenForge is a decentralized platform that allows users to buy and sell NFTs representing computing resources such as CPU, GPU, and storage devices. By leveraging blockchain technology, TokenForge creates a transparent and secure marketplace where users can trade computing power as easily as digital assets, all without the need for intermediaries.
+TokenForge is a decentralized platform that allows users to buy and sell NFTs representing computing resources such as CPU, GPU and storage devices. By leveraging blockchain technology, TokenForge creates a transparent and secure marketplace where users can trade computing power as easily as digital assets, all without the need for intermediaries.
 
-Features :
+FEATURES :
 
 1. Decentralized Marketplace: TokenForge enables peer-to-peer trading of NFTs representing computing resources, ensuring transparency and eliminating the need for intermediaries like banks or brokers.
    
@@ -14,11 +14,9 @@ Features :
 4. Smart Contracts: Resource exchanges are automated through smart contracts, ensuring security, trust, and efficiency without the need for third-party oversight.
    
 5. Real-Time Pricing: The platform provides live prices for NFTs, enabling users to make informed decisions based on market demand.
-   
-6. User Wallets: Secure wallets allow users to store, manage, and track their tokens and transaction history.
-   
+      
 
-How It Works
+HOW IT WORKS 
 
 1. Buy & Sell NFTs: Users can mint NFTs representing computing resources like CPU, GPU or other  storage devices. These NFTs can be bought and sold on the 
    marketplace.
@@ -27,7 +25,8 @@ How It Works
    
 3. Smart Contracts: Smart contracts automatically execute trades and transfers between users without needing intermediaries, reducing costs and delays.
 
-Technology Stack
+
+TECHNOLOGY STACK
 
 Frontend: React, JavaScript, CSS
 
@@ -38,11 +37,11 @@ Blockchain: Solidity, Hardhat, Smart Contracts
 Wallet Integration: MetaMask
 
 
-Contributing
+CONTRIBUTING
 
 If you would like to contribute to TokenForge, feel free to open an issue or submit a pull request. We welcome all contributions that can help make the platform better.
 
-Developers
+DEVELOPERS
 
 TokenForge is developed and maintained by  Syantax Squad Team .
 
