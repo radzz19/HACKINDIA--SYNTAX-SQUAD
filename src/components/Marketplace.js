@@ -1,8 +1,10 @@
+// src/components/Marketplace.jsx
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { JsonRpcProvider, Contract } from 'ethers';
+import { ethers, JsonRpcProvider, Contract } from 'ethers';
+import GPUContract from "../path/to/GPUContract.json"; // Update with your ABI path
 import ContractABI from "../YourContractABI.json"; // Import the ABI file
 import {
   Chart as ChartJS,
@@ -160,30 +162,49 @@ const CustomModel = () => {
   );
 };
 
-const contractAddress = "0x0813d4a158d06784FDB48323344896B2B1aa0F85"; // Replace with your deployed contract address
+// Contract details
+const contractAddress = "0xB9e2A2008d3A58adD8CC1cE9c15BF6D4bB9C6d72"; // Replace with your deployed contract address
+const infuraProjectId = "4d15bf16e9dc4ce180bcff85a92b79a6"; // Your Infura project ID
+const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${infuraProjectId}`);
+const contract = new Contract(contractAddress, ContractABI, provider);
 
 const Marketplace = () => {
   const [account, setAccount] = useState(null);
   const [resources, setResources] = useState([]);
+  const [gpuResources, setGpuResources] = useState([]);
   const [resourceDetails, setResourceDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
-  const provider = new JsonRpcProvider(
-    `https://polygon-mainnet.infura.io/v3/4d15bf16e9dc4ce180bcff85a92b79a6`
-  );
+  // Form state for listing a token resource
+  const [formData, setFormData] = useState({
+    Type: "",
+    scope: "",
+    price: "",
+    Units: "",
+  });
 
-  const contract = new Contract(contractAddress, ContractABI, provider);
+  // Form state for listing a GPU resource
+  const [gpuFormData, setGpuFormData] = useState({
+    ram: "",
+    cores: "",
+    clockSpeed: "",
+  });
 
   const connectWallet = async () => {
     if (window.ethereum) {
       try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        console.log("Connected account:", accounts[0]);
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         setAccount(accounts[0]);
+
+        // Create a provider and signer
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner(); // Get the signer
+        contract = contract.connect(signer); // Connect the contract with the signer
+
+        // Fetch resources after connecting the wallet
+        fetchResources(); 
+        fetchGpuResources(); 
       } catch (error) {
         alert("Error connecting wallet. Please try again.");
         console.error("Error connecting wallet:", error);
@@ -210,84 +231,164 @@ const Marketplace = () => {
     }
   };
 
-  const fetchResource = async (resourceId) => {
+  const fetchGpuResources = async () => {
+    if (!window.ethereum) return;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const contractWithSigner = new ethers.Contract(contractAddress, GPUContract.abi, provider);
+    
     try {
-      setLoading(true);
-      const [Type, scope, price, Units, owner] = await contract.getResource(
-        resourceId
-      );
-      setResourceDetails({ Type, scope, price, Units, owner });
-      console.log("Resource details:", { Type, scope, price, Units, owner });
+      const resourceCount = await contractWithSigner.getResourceCount();
+      const fetchedGpuResources = [];
+      for (let i = 0; i < resourceCount.toNumber(); i++) {
+        const resource = await contractWithSigner.resources(i);
+        fetchedGpuResources.push(resource);
+      }
+      setGpuResources(fetchedGpuResources);
     } catch (error) {
-      console.error("Error fetching resource details:", error);
+      console.error("Error fetching GPU resources:", error);
+      alert("Error fetching resources. Please try again.");
+    }
+  };
+
+  const fetchResourceDetails = async (id) => {
+    const resource = await contract.getResource(id);
+    setResourceDetails(resource);
+    setIsOpen(true);
+  };
+
+  const handleResourceSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const tx = await contract.listResource(formData.Type, formData.scope, ethers.utils.parseEther(formData.price), formData.Units);
+      await tx.wait();
+      alert("Resource listed successfully!");
+      fetchResources(); // Fetch updated resources
+    } catch (error) {
+      console.error("Error listing resource:", error);
+      alert("Error listing resource. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const listResource = async (_Type, scope, _price, AUnits) => {
+  const handleGpuResourceSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      if (!account) return connectWallet();
-
-      const signer = provider.getSigner();
-      const contractWithSigner = contract.connect(signer);
-
-      const transaction = await contractWithSigner.Enter_Token_Info(
-        _Type,
-        scope,
-        _price,
-        AUnits
-      );
-      await transaction.wait();
-      console.log("Resource listed successfully!");
-      fetchResources();
+      const tx = await contract.listGpuResource(gpuFormData.ram, gpuFormData.cores, gpuFormData.clockSpeed);
+      await tx.wait();
+      alert("GPU resource listed successfully!");
+      fetchGpuResources(); // Fetch updated GPU resources
     } catch (error) {
-      console.error("Error listing resource:", error);
+      console.error("Error listing GPU resource:", error);
+      alert("Error listing GPU resource. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchResources();
-  }, []);
-
-  const data = {
-    labels: ["1", 2, 3, 4, 5],
-    datasets: [
-      {
-        label: "Price Over Time",
-        data: [10, 15, 13, 17, 14],
-        borderColor: "#ff6f91",
-        backgroundColor: "rgba(255, 111, 145, 0.3)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
   };
 
   return (
     <MarketplaceWrapper>
-      <h1>Tokenized Cloud Marketplace</h1>
-      <MoreDetailsButton onClick={() => connectWallet()}>
-        {account ? `Wallet Connected: ${account}` : "Connect Wallet"}
-      </MoreDetailsButton>
-
+      <h1>Marketplace</h1>
+      <button onClick={connectWallet}>Connect Wallet</button>
       <CardList>
-        {resources.map((resource, idx) => (
-          <Card
-            key={idx}
-            onClick={() => {
-              fetchResource(idx);
-              setSelectedItem(resource);
-              setIsOpen(true);
-            }}
-          >
+        {resources.map((resource, index) => (
+          <Card key={index} onClick={() => fetchResourceDetails(index)}>
             <h3>{resource.Type}</h3>
             <p>Scope: {resource.scope}</p>
-            <p>Price: {resource.price}</p>
+            <p>Price: {ethers.utils.formatEther(resource.price)} ETH</p>
             <p>Units: {resource.Units}</p>
           </Card>
         ))}
       </CardList>
+
+      <h2>List a Token Resource</h2>
+      <form onSubmit={handleResourceSubmit}>
+        <input
+          type="text"
+          placeholder="Type"
+          value={formData.Type}
+          onChange={(e) => setFormData({ ...formData, Type: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Scope"
+          value={formData.scope}
+          onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Price in ETH"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Units"
+          value={formData.Units}
+          onChange={(e) => setFormData({ ...formData, Units: e.target.value })}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Listing..." : "List Resource"}
+        </button>
+      </form>
+
+      <h2>GPU Resources</h2>
+      <CardList>
+        {gpuResources.map((gpuResource, index) => (
+          <Card key={index}>
+            <h3>RAM: {gpuResource.ram} GB</h3>
+            <p>Cores: {gpuResource.cores}</p>
+            <p>Clock Speed: {gpuResource.clockSpeed} GHz</p>
+          </Card>
+        ))}
+      </CardList>
+
+      <h2>List a GPU Resource</h2>
+      <form onSubmit={handleGpuResourceSubmit}>
+        <input
+          type="text"
+          placeholder="RAM (GB)"
+          value={gpuFormData.ram}
+          onChange={(e) => setGpuFormData({ ...gpuFormData, ram: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Cores"
+          value={gpuFormData.cores}
+          onChange={(e) => setGpuFormData({ ...gpuFormData, cores: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Clock Speed (GHz)"
+          value={gpuFormData.clockSpeed}
+          onChange={(e) => setGpuFormData({ ...gpuFormData, clockSpeed: e.target.value })}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Listing..." : "List GPU Resource"}
+        </button>
+      </form>
+
+      <SidePanel isOpen={isOpen}>
+        <SidePanelHeader>
+          <h2>Resource Details</h2>
+          <button onClick={() => setIsOpen(false)}>Close</button>
+        </SidePanelHeader>
+        <SidePanelContent>
+          <p>Type: {resourceDetails.Type}</p>
+          <p>Scope: {resourceDetails.scope}</p>
+          <p>Price: {ethers.utils.formatEther(resourceDetails.price)} ETH</p>
+          <p>Units: {resourceDetails.Units}</p>
+        </SidePanelContent>
+      </SidePanel>
 
       <BoxWrapper>
         <Canvas>
@@ -297,34 +398,6 @@ const Marketplace = () => {
           <OrbitControls />
         </Canvas>
       </BoxWrapper>
-
-      <Line
-        data={data}
-        options={{
-          scales: {
-            y: { beginAtZero: true },
-          },
-        }}
-      />
-
-      <SidePanel isOpen={isOpen}>
-        <SidePanelHeader>
-          <h2>{resourceDetails.Type}</h2>
-        </SidePanelHeader>
-        <SidePanelContent>
-          <p>Scope: {resourceDetails.scope}</p>
-          <p>Price: {resourceDetails.price} ETH</p>
-          <p>Units Available: {resourceDetails.Units}</p>
-          <p>Owner: {resourceDetails.owner}</p>
-
-          <SidePanelActionButton onClick={() => alert("Resource rented!")}>
-            Rent Resource
-          </SidePanelActionButton>
-          <SidePanelActionButton onClick={() => setIsOpen(false)}>
-            Close
-          </SidePanelActionButton>
-        </SidePanelContent>
-      </SidePanel>
     </MarketplaceWrapper>
   );
 };
