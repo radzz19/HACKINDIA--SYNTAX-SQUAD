@@ -41,6 +41,9 @@ CONTRIBUTING
 
 If you would like to contribute to TokenForge, feel free to open an issue or submit a pull request. We welcome all contributions that can help make the platform better.
 
+
+REFER TO ASSERTS FOLDER TO VIEW IMAGES OF THE PROJECT . 
+
 DEVELOPERS
 
 TokenForge is developed and maintained by  Syantax Squad Team .
